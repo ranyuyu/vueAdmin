@@ -17,11 +17,11 @@ export default {
     },
     methods:{
         queryAjax(){
-               console.log('queryAjax');
                let data = {
-
-               }
-               postApi('getDbNum', data, res => {})
+                    doctorId:10193,
+                    isOpen:1
+                }
+               postApi('/live-app/app/findLjDoctor', data, res => {})
         }
     },
     components:{

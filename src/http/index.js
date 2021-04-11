@@ -6,7 +6,7 @@ import { getToken } from '@/utils/auth';
 // 创建axios实例
 const service = axios.create({
     // baseURL: process.env.VUE_APP_BASE_API, //URL地址   环境变量文件 .env.development
-    baseURL:'www.qyap.tech:5000/', //URL地址   环境变量文件 .env.development
+    baseURL:'https://prod.360ljk.com/zuul/', //URL地址   环境变量文件 .env.development
     timeout: 5000 ,//超时
     withCredentials: true,  //跨域时若要发生cookie,需要设置该选项
 })
