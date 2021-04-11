@@ -1,6 +1,6 @@
 <template>
     <div class="index">
-        <el-select v-model="value" placeholder="请选择">
+        <!-- <el-select v-model="value" placeholder="请选择">
             <el-option
             v-for="item in dbLsit"
             :key="item.value"
@@ -8,8 +8,9 @@
             :value="item.value"
             :disabled="item.disabled">
             </el-option>
-        </el-select>
-        <el-button type="primary" @click="addModal">新增</el-button>
+        </el-select> -->
+        <el-button type="primary" @click="addModal">新增key</el-button>
+         <el-button type="primary" @click="addModalx">新增行</el-button>
 
         <el-dialog
             title="提示"
@@ -80,13 +81,23 @@
                               <el-table-column
                                 prop="key"
                                 label="操作"
+                                
                                 >
-                                <el-row>
-                                <el-button type="primary" icon="el-icon-edit" circle @click="handleDetails"></el-button>
-                                <el-button type="danger" icon="el-icon-delete" circle @click="handleDelete"></el-button>
-                                </el-row>
+                                <template slot-scope="scope">
+                                    <el-row>
+                                        <el-button type="primary" icon="el-icon-edit" circle @click="handleDetails"></el-button>
+                                        <el-button type="danger" icon="el-icon-delete" circle @click="handleDelete(scope.row)"></el-button>
+                                    </el-row>
+                                </template>
+                                
                             </el-table-column>
                         </el-table>
+                    </div>
+                    
+                    <div v-if="selectKeysType == 'string'" >
+                        <h1>addString</h1>
+                        <el-input v-model="valueString" placeholder="请输入内容"></el-input>
+                         <el-button type="danger" icon="el-icon-delete" circle @click="handleString()">保存</el-button>
                     </div>
                 </div>
             </el-collapse-item>
@@ -96,9 +107,11 @@
 
 <script>
 import { postApi } from '../../http/request'
+import { MessageBox, Message } from 'element-ui'
 export default {
     data(){
         return {
+            valueString:"",
             fieldName:"",
             fieldValue:"",
              dialogVisiblex:false,
@@ -121,15 +134,21 @@ export default {
                 label: 'string'
             }],
             value: '',
-            selectKeysType:""
+            selectKeysType:"",
+            fileTypeName:""
         }
     },
     created(){
         this.queryAjax();
     },
     methods:{
+        handleString(){
+            // valueString
+            this.value = "string"
+          this.handleSumit()
+        },
         handleSumitFile(){
-              const { host , port , password ,fieldName , fieldValue } = this
+              const { host , port , password ,fieldName , fieldValue , fileTypeName } = this
              let length = this.activeNames.length
                 let db = this.activeNames[length-1]
             let formdata = new FormData();
@@ -137,16 +156,18 @@ export default {
                 formdata.append('port',port);
                 formdata.append('password',password);
                 formdata.append('db',db);
-                formdata.append('key',fieldName);
+                formdata.append('key',fileTypeName);
                 formdata.append('value',fieldValue);
-                formdata.append('field',fieldName+'q');
+                formdata.append('field', fieldName );
                       postApi('/api/addHash',formdata, res => {
                         this.queryAjax()
+                        this.onChange();
                         this.dialogVisiblex = false
                     })
         },
-        handleDelete(){
-            const { host , port , password ,fieldValue , fieldName } = this
+        handleDelete(val){
+            console.log(val)
+            const { host , port , password ,fieldValue , fieldName , fileTypeName} = this
             let length = this.activeNames.length
             let db = this.activeNames[length-1]
             let formdata = new FormData();
@@ -154,9 +175,16 @@ export default {
                 formdata.append('port',port);
                 formdata.append('password',password);
                 formdata.append('db',db);
-                formdata.append('key',fieldValue);
-              formdata.append('field',fieldName);
+                formdata.append('key',fileTypeName);
+              formdata.append('field',val.name);
                       postApi('/api/delHashField',formdata, res => {
+                        // this.$message.sussage("删除成功")
+                          Message({
+                message:"删除成功",
+                type: 'delHashField',
+                duration: 5*1000
+            })
+            this.onChange()
                         this.queryAjax()
                         this.dialogVisiblex = false
                     })
@@ -165,7 +193,7 @@ export default {
                 this.dialogVisiblex = true
         },
         handleSumit(){
-            const { host , port , password ,value , keyValue } = this
+            const { host , port , password ,value , fileTypeName } = this
              let length = this.activeNames.length
                 let db = this.activeNames[length-1]
             let formdata = new FormData();
@@ -191,6 +219,9 @@ export default {
         },
         addModal(){
             this.dialogVisible = true
+        },
+        addModalx(){
+            this.dialogVisiblex = true
         },
         handleChange(val){
            const { host , port , password } = this
@@ -228,8 +259,10 @@ export default {
             })
         },
         onChange(val){
-               console.log(val);
-                const { host , port , password } = this
+                const { host , port , password , fileTypeName } = this
+                if(val){
+                     this.fileTypeName = val;
+                }
                 let length = this.activeNames.length
                 let db = this.activeNames[length-1]
                 let formdata = new FormData();
