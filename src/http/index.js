@@ -6,7 +6,7 @@ import { getToken } from '@/utils/auth';
 // 创建axios实例
 const service = axios.create({
     // baseURL: process.env.VUE_APP_BASE_API, //URL地址   环境变量文件 .env.development
-    baseURL:'https://prod.360ljk.com/zuul/', //URL地址   环境变量文件 .env.development
+    // baseURL:'https://prod.360ljk.com/zuul/', //URL地址   环境变量文件 .env.development
     timeout: 5000 ,//超时
     withCredentials: true,  //跨域时若要发生cookie,需要设置该选项
 })
@@ -19,6 +19,7 @@ service.interceptors.request.use(
         if(store.getters.token){
             // 设置令牌请求头
             console.log(getToken(),'getToken()');
+             config.headers['Content-type'] = 'application/json; charset=utf-8'
             config.headers['Authorization'] = getToken()
         }
         return config
@@ -33,9 +34,9 @@ service.interceptors.response.use(
     // 通过自定义code 判定响应状态 也可以通过HTTP状态码判断
     response =>{
         const res = response.data
-        
+      
         // code 不为0 则判断为一个错误
-        if(res.code !== 0){
+        if(res.code == 200){
             Message({
                 message: res.msg || "Error",
                 type: 'error',
@@ -62,19 +63,19 @@ service.interceptors.response.use(
                 })
             }
 
-            return Promise.reject(new Error(res.message || 'Error'));
-    
+            // return Promise.reject(new Error(res.message || 'Error'));
+            return res
         }else{
             return res;
         }
     },
     error =>{
         console.log(error,'error');
-        Message({
-            message: error.message,
-            type: 'error',
-            duration: 5*1000
-        })
+        // Message({
+        //     message: error.message,
+        //     type: 'error',
+        //     duration: 5*1000
+        // })
     }
 )
 
