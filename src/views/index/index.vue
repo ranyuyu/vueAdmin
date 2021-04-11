@@ -1,17 +1,17 @@
 <template>
     <div class="index">
-        <!-- <el-select v-model="value" placeholder="请选择">
-            <el-option
-            v-for="item in dbLsit"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-            :disabled="item.disabled">
-            </el-option>
-        </el-select> -->
         <el-button type="primary" @click="addModal">新增key</el-button>
-         <el-button type="primary" @click="addModalx">新增行</el-button>
-
+        <el-button type="primary" @click="addModalx">新增行</el-button>
+                    <el-popconfirm
+            confirm-button-text='好的'
+            cancel-button-text='不用了'
+            icon="el-icon-info"
+            icon-color="red"
+            title="这是一段内容确定删除吗？"
+            @confirm="deleteClick"
+            >
+            <el-button slot="reference">删除</el-button>
+</el-popconfirm>
         <el-dialog
             title="提示"
             :visible.sync="dialogVisiblex"
@@ -95,9 +95,8 @@
                     </div>
                     
                     <div v-if="selectKeysType == 'string'" >
-                        <h1>addString</h1>
                         <el-input v-model="valueString" placeholder="请输入内容"></el-input>
-                         <el-button type="danger" icon="el-icon-delete" circle @click="handleString()">保存</el-button>
+                         <el-button type="danger" style="mrgin-top:20px"  @click="handleString()">保存</el-button>
                     </div>
                 </div>
             </el-collapse-item>
@@ -142,10 +141,41 @@ export default {
         this.queryAjax();
     },
     methods:{
+        deleteClick(){
+             const { host , port , password ,fileTypeName , valueString } = this
+             let length = this.activeNames.length
+                let db = this.activeNames[length-1]
+            let formdata = new FormData();
+                formdata.append('host',host);
+                formdata.append('port',port);
+                formdata.append('password',password);
+                formdata.append('db',db);
+                formdata.append('key',fileTypeName);
+                postApi('/api/delKey',formdata, res => {
+                        this.queryAjax()
+                                  Message({
+                message:"删除成功",
+                type: 'delHashField',
+                duration: 5*1000
+            })
+                        this.dialogVisible = false
+                })
+        },
         handleString(){
-            // valueString
-            this.value = "string"
-          this.handleSumit()
+              const { host , port , password ,fileTypeName , valueString } = this
+             let length = this.activeNames.length
+                let db = this.activeNames[length-1]
+            let formdata = new FormData();
+                formdata.append('host',host);
+                formdata.append('port',port);
+                formdata.append('password',password);
+                formdata.append('db',db);
+                formdata.append('key',fileTypeName);
+                formdata.append('value',valueString);
+                postApi('/api/addString',formdata, res => {
+                        this.queryAjax()
+                        this.dialogVisible = false
+                })
         },
         handleSumitFile(){
               const { host , port , password ,fieldName , fieldValue , fileTypeName } = this
@@ -193,7 +223,7 @@ export default {
                 this.dialogVisiblex = true
         },
         handleSumit(){
-            const { host , port , password ,value , fileTypeName } = this
+            const { host , port , password ,value , fileTypeName  , valueString , keyValue } = this
              let length = this.activeNames.length
                 let db = this.activeNames[length-1]
             let formdata = new FormData();
@@ -202,7 +232,7 @@ export default {
                 formdata.append('password',password);
                 formdata.append('db',db);
                 formdata.append('key',keyValue);
-                formdata.append('value',value);
+                formdata.append('value',valueString);
                 if(this.value == 'string'){
                      postApi('/api/addString',formdata, res => {
                         this.queryAjax()
@@ -286,7 +316,7 @@ export default {
                         }
                         this.tableData =  arr
                     } else {
-
+                        this.valueString = res.value.value  
                     }
                 })
         }
