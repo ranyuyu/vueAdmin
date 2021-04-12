@@ -37,11 +37,11 @@ service.interceptors.response.use(
       
         // code 不为0 则判断为一个错误
         if(res.code == 200){
-            Message({
-                message: res.msg || "Error",
-                type: 'error',
-                duration: 5*1000
-            })
+            // Message({
+            //     message: res.msg || "Error",
+            //     type: 'error',
+            //     duration: 5*1000
+            // })
         
 
             // 假设 10008 非法令牌  10012 其他客户端已经登陆

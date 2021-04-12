@@ -1,27 +1,37 @@
 <template>
     <div class="index">
-        <el-button type="primary" @click="addModal">新增key</el-button>
-        <el-button type="primary" @click="addModalx">新增行</el-button>
+        <div class="add-index">
+            <el-select v-model="dbValue" placeholder="请选择" @change="handleChange">
+                <el-option
+                v-for="item in totalNumber"
+                :key="item-1"
+                :label="item-1"
+                :value="item-1">
+                </el-option>
+            </el-select>
+             <el-button type="primary" @click="addModal">新增key</el-button>
+            <el-button type="primary" @click="addModalx">新增行</el-button>
                     <el-popconfirm
-            confirm-button-text='好的'
-            cancel-button-text='不用了'
-            icon="el-icon-info"
-            icon-color="red"
-            title="这是一段内容确定删除吗？"
-            @confirm="deleteClick"
-            >
-            <el-button slot="reference">删除</el-button>
-</el-popconfirm>
+                        confirm-button-text='好的'
+                        cancel-button-text='不用了'
+                        icon="el-icon-info"
+                        icon-color="red"
+                        title="这是一段内容确定删除吗？"
+                        @confirm="deleteClick"
+                        >
+                        <el-button slot="reference">删除</el-button>
+            </el-popconfirm>
+        </div>
         <el-dialog
             title="提示"
             :visible.sync="dialogVisiblex"
             width="30%"
             :before-close="handleClose">
-            <div>
+            <div style="margin-top:20px">
                 <div>key 名字</div>
                 <el-input v-model="fieldName" placeholder="请输入内容"></el-input>
             </div>
-            <div>
+              <div style="margin-top:20px">
                 <div>类型</div>
                <el-input v-model="fieldValue" placeholder="请输入内容"></el-input>
             </div>
@@ -57,11 +67,11 @@
             </span>
             </el-dialog>
 
-        <el-collapse v-model="activeNames" @change="handleChange">
-            <el-collapse-item :title="index" :name="index"  v-for="(item,index) in totalNumber" :key="index">
+        <!-- <el-collapse v-model="activeNames" @change="handleChange" accordion>
+            <el-collapse-item :title="'db'+index" :name="index"  v-for="(item,index) in totalNumber" :key="index"> -->
                 <div class="item-index">
-                     <div>
-                         <div v-for="(items,idx) in keysList" :key="idx" @click="onChange(items)">{{ items }}</div>
+                     <div class="item-copy">
+                         <div v-for="(items,idx) in keysList" :key="idx" @click="onChange(items,idx)"  :style="{'color':(activeKey === idx ? '#fffff':'#ccccc'),'background':(activeKey === idx ? '#F5F7F9':'#ffff')}">{{ items }}</div>
                      </div>
                     <div class="item-view" v-if="selectKeysType == 'hash'">
                         <el-table
@@ -69,12 +79,12 @@
                         style="width:1400px">
                             <el-table-column
                                 prop="name"
-                                label="日期"
+                                label="key"
                                 >
                             </el-table-column>
                             <el-table-column
                                 prop="key"
-                                label="日期"
+                                label="value"
                                 >
                             </el-table-column>
 
@@ -94,13 +104,15 @@
                         </el-table>
                     </div>
                     
-                    <div v-if="selectKeysType == 'string'" >
-                        <el-input v-model="valueString" placeholder="请输入内容"></el-input>
-                         <el-button type="danger" style="mrgin-top:20px"  @click="handleString()">保存</el-button>
+                    <div v-if="selectKeysType == 'string'" style="margin-left:20px">
+                        <el-input v-model="valueString"   type="textarea"
+  :autosize="{ minRows: 20, maxRows: 80}" placeholder="请输入内容" style="width:1100px" height="2000px"></el-input>
+  <div></div>
+                         <el-button type="danger" style="margin-top:20px"  @click="handleString()">保存</el-button>
                     </div>
                 </div>
-            </el-collapse-item>
-        </el-collapse>
+            <!-- </el-collapse-item>
+        </el-collapse> -->
     </div>
 </template>
 
@@ -115,6 +127,7 @@ export default {
             fieldValue:"",
              dialogVisiblex:false,
             dialogVisible:false,
+            activeKey:"",
             tableData:[
                 
             ],
@@ -134,17 +147,20 @@ export default {
             }],
             value: '',
             selectKeysType:"",
-            fileTypeName:""
+            fileTypeName:"",
+            dbValue:""
         }
     },
     created(){
         this.queryAjax();
     },
     methods:{
+        handleClose(){},
         deleteClick(){
-             const { host , port , password ,fileTypeName , valueString } = this
+             const { host , port , password ,fileTypeName , dbValue } = this
              let length = this.activeNames.length
-                let db = this.activeNames[length-1]
+                // let db = this.activeNames[length-1]
+                  let db = dbValue
             let formdata = new FormData();
                 formdata.append('host',host);
                 formdata.append('port',port);
@@ -162,9 +178,10 @@ export default {
                 })
         },
         handleString(){
-              const { host , port , password ,fileTypeName , valueString } = this
+              const { host , port , password ,fileTypeName , valueString , dbValue } = this
              let length = this.activeNames.length
-                let db = this.activeNames[length-1]
+                // let db = this.activeNames[length-1]
+                 let db = dbValue
             let formdata = new FormData();
                 formdata.append('host',host);
                 formdata.append('port',port);
@@ -178,9 +195,10 @@ export default {
                 })
         },
         handleSumitFile(){
-              const { host , port , password ,fieldName , fieldValue , fileTypeName } = this
+              const { host , port , password ,fieldName , fieldValue , fileTypeName ,dbValue } = this
              let length = this.activeNames.length
-                let db = this.activeNames[length-1]
+                // let db = this.activeNames[length-1]
+                  let db = dbValue
             let formdata = new FormData();
                 formdata.append('host',host);
                 formdata.append('port',port);
@@ -197,9 +215,10 @@ export default {
         },
         handleDelete(val){
             console.log(val)
-            const { host , port , password ,fieldValue , fieldName , fileTypeName} = this
+            const { host , port , password ,fieldValue , dbValue , fileTypeName} = this
             let length = this.activeNames.length
-            let db = this.activeNames[length-1]
+            // let db = this.activeNames[length-1]
+              let db = dbValue
             let formdata = new FormData();
                 formdata.append('host',host);
                 formdata.append('port',port);
@@ -223,9 +242,10 @@ export default {
                 this.dialogVisiblex = true
         },
         handleSumit(){
-            const { host , port , password ,value , fileTypeName  , valueString , keyValue } = this
+            const { host , port , password ,value , dbValue  , valueString , keyValue } = this
              let length = this.activeNames.length
-                let db = this.activeNames[length-1]
+                // let db = this.activeNames[length-1]
+                let db = dbValue
             let formdata = new FormData();
                 formdata.append('host',host);
                 formdata.append('port',port);
@@ -254,9 +274,14 @@ export default {
             this.dialogVisiblex = true
         },
         handleChange(val){
-           const { host , port , password } = this
+        //     console.log(this.activeNames,'activeNames');
+        //    let lengths = this.activeNames.length
+        //    this.activeNames = this.activeNames[length-1]
+        //     console.log(this.activeNames[lengths-1],'value');
+           const { host , port , password , dbValue } = this
                 let length = this.activeNames.length
-                let db = this.activeNames[length-1]
+                // let db = this.activeNames[length-1]
+                let db = dbValue
                 let formdata = new FormData();
                 formdata.append('host',host);
                 formdata.append('port',port);
@@ -278,8 +303,6 @@ export default {
                   formdata.append('password',password);
                   postApi('/api/getDbNum',formdata, res => {
                          this.totalNumber =  Number(res.db_num)
-                        //  let data = formdata
-                        //  data.db = res.db_num 
                         this.querydb(data);
                  })
         },
@@ -288,13 +311,16 @@ export default {
                 this.keysList = res.keys
             })
         },
-        onChange(val){
-                const { host , port , password , fileTypeName } = this
+        onChange(val,key){
+              console.log(key,'activeKey');
+                this.activeKey = key
+                const { host , port , password , fileTypeName , dbValue } = this
                 if(val){
                      this.fileTypeName = val;
                 }
                 let length = this.activeNames.length
-                let db = this.activeNames[length-1]
+                // let db = this.activeNames[length-1]
+                let db = dbValue
                 let formdata = new FormData();
                 formdata.append('host',host);
                 formdata.append('port',port);
@@ -331,8 +357,24 @@ export default {
     .index{
         padding:20px;
     }
+    .index .add-index{
+        margin-bottom:30px;
+    }
     .index .item-index{
         display:flex;
+        
+    }
+     .index .item-index .item-copy{
+        width:400px;
+          box-shadow: 10px 10px 5px #ffffff;
+        background:#ffffff; 
+    }
+     .index .item-index .item-copy div{
+         font-size:22px;
+         text-align:center;
+         line-height:40px;
+          width:400px;
+        height:40px;
     }
     .index .item-index .item-view{
         margin-left:20px;

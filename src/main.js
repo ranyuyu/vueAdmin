@@ -49,6 +49,18 @@ Vue.use(ElementUI);
 // 全局路由守卫
 import './router/permission'
 
+
+import VueSocketIO from 'vue-socket.io'
+import SocketIO from 'socket.io-client'
+
+Vue.use(new VueSocketIO({
+  // 生产环境需要切换成false
+ debug: true,
+ // 连接的后端地址  
+ connection: SocketIO('http://localhost:3000?token=ab'),
+}))
+
+
 // 全局注册指令
 import vPermission from './directive/permission'
 Vue.directive('permission',vPermission)

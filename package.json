@@ -22,6 +22,7 @@
     "vue-particles": "^1.0.9",
     "vue-router": "^3.1.5",
     "vue-seamless-scroll": "^1.1.17",
+    "vue-socket.io": "^3.0.7",
     "vue-svg-loader": "^0.16.0",
     "vue-template-compiler": "^2.6.11",
     "vuex": "^3.1.2",
